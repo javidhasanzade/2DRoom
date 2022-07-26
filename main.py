@@ -4,46 +4,48 @@ from Point import Point
 
 lines: list[Line] = [Line(Point(1, -1), Point(1, 1)),
                      Line(Point(2, -1), Point(2, 1)),
-                     Line(Point(2, 3), Point(6, 3))]
+                     Line(Point(2, 3), Point(6, 3)),
+                     Line(Point(-5, 0), Point(1, 0))]
 
 inputDegree: int = 0
 XP0: int = 0
 YP0: int = 0
 
 
-def solution(XP_0: int, YP_0: int, input_degree: int, llines: list[Line]) -> Line:
-    currentMin: int = 2147483647  # Integer max size
-    returnId: int = 0
+def solution(xp0: int, yp0: int, input_degree: int, l_lines: list[Line]) -> Line:
+    current_min: int = 2147483647  # Integer max size
+    return_id: int = 0
     degree: float = math.radians(input_degree)
-    maxDist: int = 2147483647  # Integer max size
+    max_dist: int = 2147483647  # Integer max size
 
-    for segment in llines:
-        endY: int = segment.end.y
-        endX: int = segment.end.x
-        stY: int = segment.start.y
-        stX: int = segment.start.x
-        id: int = llines.index(segment)
+    for segment in l_lines:
+        end_y: int = segment.end.y
+        end_x: int = segment.end.x
+        st_y: int = segment.start.y
+        st_x: int = segment.start.x
+        lid: int = l_lines.index(segment)
 
-        for i in range(1, maxDist, 1):
-            YP: int = int(YP_0 + (i * math.sin(degree)))
-            XP: int = int(XP_0 + (i * math.cos(degree)))
-            if not(i < currentMin):
+        for i in range(1, max_dist, 1):
+            YP: int = int(yp0 + (i * math.sin(degree)))
+            XP: int = int(xp0 + (i * math.cos(degree)))
+            if not(i < current_min):
                 break
-            if endX == stX:
-                if XP == stX:
-                    currentMin = i
-                    returnId = id
+            if end_x == st_x:
+                if XP == st_x:
+                    current_min = i
+                    return_id = lid
                     break
-            elif endY == stY:
-                if YP == stY:
-                    currentMin = i
-                    returnId = id
+            elif end_y == st_y:
+                if YP == st_y:
+                    current_min = i
+                    return_id = lid
                     break
-            elif YP == ((endY - stY) / (endX - stX)) * XP + (stY - ((endY - stY) / (endX - stX)) * stX):
-                currentMin = i
-                returnId = id
+            elif YP == ((end_y - st_y) / (end_x - st_x)) * XP + (st_y - ((end_y - st_y) / (end_x - st_x)) * st_x):
+                current_min = i
+                return_id = lid
                 break
 
-    return llines.__getitem__(returnId)
+    return l_lines.__getitem__(return_id)
+
 
 print(solution(XP0, YP0, inputDegree, lines))
