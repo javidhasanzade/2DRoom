@@ -1,22 +1,37 @@
 import math
+import numpy as np
 from Line import Line
 from Point import Point
 
-lines: list[Line] = [Line(Point(1, -1), Point(1, 1)),
-                     Line(Point(2, -1), Point(2, 1)),
-                     Line(Point(2, 3), Point(6, 3)),
-                     Line(Point(-5, 0), Point(1, 0))]
+lines = [Line(Point(-3, 0), Point(-1, 2)),
+          Line(Point(2, 0), Point(2, 2)),
+          Line(Point(4, 0), Point(4, 4)),
+          Line(Point(1, 3), Point(3, 3)),
+          Line(Point(1, 4), Point(3, 4)),
+          Line(Point(1, -3), Point(3, -1)),
+          Line(Point(2, -3), Point(3, -2)),
+          Line(Point(-4, 3), Point(-2, 2)),
+          Line(Point(-3, 0), Point(-1, -2)),
+          Line(Point(-4, -2), Point(-2, -4)),
+          Line(Point(-3, -1), Point(-2, -2)),
+          Line(Point(-1, 5), Point(1, 5)),
+          Line(Point(-1, -5), Point(1, -5))]
 
 inputDegree: int = 0
 XP0: int = 0
 YP0: int = 0
 
 
+def max_distance(line: Line, xp0: int, yp0: int):
+    end_dist: int = int(math.sqrt(math.pow((line.end.y - yp0), 2) + math.pow((line.end.x - xp0), 2)))
+    st_dist: int = int(math.sqrt(math.pow((line.start.y - yp0), 2) + math.pow((line.start.x - xp0), 2)))
+    return max(end_dist, st_dist)
+
+
 def solution(xp0: int, yp0: int, input_degree: int, l_lines: list[Line]) -> Line:
-    current_min: int = 2147483647  # Integer max size
-    return_id: int = 0
+    current_min: float = 2147483647  # Integer max size
+    return_id: int = -1
     degree: float = math.radians(input_degree)
-    max_dist: int = 2147483647  # Integer max size
 
     for segment in l_lines:
         end_y: int = segment.end.y
@@ -25,27 +40,47 @@ def solution(xp0: int, yp0: int, input_degree: int, l_lines: list[Line]) -> Line
         st_x: int = segment.start.x
         lid: int = l_lines.index(segment)
 
-        for i in range(1, max_dist, 1):
-            YP: int = int(yp0 + (i * math.sin(degree)))
-            XP: int = int(xp0 + (i * math.cos(degree)))
-            if not(i < current_min):
+        for i in np.arange(0, max_distance(segment, xp0, yp0)*2+1, 0.01):
+            YP_exact: float = yp0 + (i * math.sin(degree))
+            XP_exact: float = xp0 + (i * math.cos(degree))
+            YP: int = int(YP_exact)
+            XP: int = int(XP_exact)
+
+            if not (i < current_min):
                 break
+
+            YP_exact_r: float = round(YP_exact, 4)
+            XP_exact_r: float = round(XP_exact, 4)
+            vert_cond = max(st_y, end_y) >= YP_exact_r >= min(st_y, end_y)
+            hor_cond = max(st_x, end_x) >= XP_exact_r >= min(st_x, end_x)
+            curve_cond = vert_cond and hor_cond
+
             if end_x == st_x:
                 if XP == st_x:
+                    if not vert_cond:
+                        continue
                     current_min = i
                     return_id = lid
                     break
             elif end_y == st_y:
                 if YP == st_y:
+                    if not hor_cond:
+                        continue
                     current_min = i
                     return_id = lid
                     break
-            elif YP == ((end_y - st_y) / (end_x - st_x)) * XP + (st_y - ((end_y - st_y) / (end_x - st_x)) * st_x):
+            elif YP_exact_r == (float((end_y - st_y)) / (end_x - st_x)) * XP_exact_r + (end_y - (float((end_y - st_y)) / (end_x - st_x)) * end_x):
+                if not curve_cond:
+                    continue
                 current_min = i
                 return_id = lid
                 break
-
+    if return_id < 0:
+        raise Exception("Not found")
     return l_lines.__getitem__(return_id)
 
 
-print(solution(XP0, YP0, inputDegree, lines))
+try:
+    print(solution(XP0, YP0, inputDegree, lines))
+except Exception as e:
+    print(e)

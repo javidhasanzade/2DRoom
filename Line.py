@@ -1,7 +1,7 @@
 from Point import Point
 
 
-class Line():
+class Line:
     def __init__(self, start: Point, end: Point):
         self.start = start
         self.end = end
